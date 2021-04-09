@@ -5,7 +5,7 @@ import TodoList from './components/TodoList';
 
 import { ITodo } from './types';
 
-export const App = (): JSX.Element => {
+const TodoApp = (): JSX.Element => {
   const [todos, setTodos] = useState<ITodo[]>([]);
 
   return (
@@ -17,4 +17,4 @@ export const App = (): JSX.Element => {
   );
 };
 
-export default App;
+export default TodoApp;
