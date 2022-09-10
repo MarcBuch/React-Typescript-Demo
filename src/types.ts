@@ -1,5 +1,5 @@
-export interface ITodo {
+export type ITodo = {
   id: number;
   content: string;
   completed: boolean;
-}
+};
