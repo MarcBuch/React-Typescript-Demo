@@ -34,7 +34,7 @@ export function Todo(): JSX.Element {
   return (
     <>
       <label htmlFor="todo-text">
-        <h1>Todo List</h1>
+        <h1 className="text-3xl font-bold underline">Todo List</h1>
         <input
           aria-label="todo-text"
           id="todo-text"
