@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
-import styles from '../styles/Home.module.css';
+import styles from '../styles/Home.module.sass';
 import React, { useState } from 'react';
 
 type ITodo = {
@@ -44,25 +44,23 @@ const Home: NextPage = () => {
       <Head>
         <title>ToDo App</title>
         <meta name="description" content="My ToDo App" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
         <h1 className={styles.title}>ToDo List</h1>
-
-        <label htmlFor="todo-text">
+        <label htmlFor="todo-text" className={styles.action}>
           <input
             aria-label="todo-text"
             id="todo-text"
             onChange={(e) => setText(e.target.value)}
             value={text}
           />
+          <button className="add-todo" onClick={addTodo} type="button">
+            Add Todo
+          </button>
         </label>
-        <button className="add-todo" onClick={addTodo} type="button">
-          Add Todo
-        </button>
 
-        <ul className="todo-list">
+        <ul className={styles.list}>
           {todos && todos.length
             ? todos.map((todo) => (
                 <li className="todo-item" key={todo.id.toString()}>
