@@ -4,14 +4,14 @@ import Image from 'next/image';
 import styles from '../styles/Home.module.sass';
 import React, { useState } from 'react';
 
-type ITodo = {
+export type Todo = {
   id: number;
-  content: string;
+  content: string | null;
   completed: boolean;
 };
 
 const useTodos = () => {
-  const [todos, setTodos] = useState<ITodo[]>([]);
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [text, setText] = useState('');
 
   const addTodo = () => {
@@ -26,7 +26,7 @@ const useTodos = () => {
     setText('');
   };
 
-  const updateStatus = (todo: ITodo): void => {
+  const updateStatus = (todo: Todo): void => {
     const newTodos = todos;
     const index = todos.findIndex((i) => i.id === todo.id);
     newTodos[index] = { ...todo, completed: !todo.completed };
