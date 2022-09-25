@@ -2,11 +2,13 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.sass';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+import { getTodos, postTodo, putTodo } from './apiConsumer';
 
 export type Todo = {
-  id: number;
-  content: string | null;
+  id?: number;
+  content: string;
   completed: boolean;
 };
 
@@ -14,30 +16,25 @@ const useTodos = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [text, setText] = useState('');
 
+  useEffect(() => {
+    getTodos().then((data) => setTodos(data ?? []));
+  }, [todos]);
+
   const addTodo = () => {
-    setTodos([
-      ...todos,
-      {
-        id: todos.length + 1,
-        content: text,
-        completed: false,
-      },
-    ]);
+    postTodo({ content: text, completed: false });
     setText('');
   };
 
-  const updateStatus = (todo: Todo): void => {
-    const newTodos = todos;
-    const index = todos.findIndex((i) => i.id === todo.id);
-    newTodos[index] = { ...todo, completed: !todo.completed };
-    setTodos([...newTodos]);
+  const updateStatus = (todo: Todo) => {
+    todo.completed = !todo.completed;
+    putTodo(todo);
   };
 
-  return { todos, updateStatus, addTodo, setText, text };
+  return { todos, text, updateStatus, addTodo, setText };
 };
 
 const Home: NextPage = () => {
-  const { todos, updateStatus, addTodo, setText, text } = useTodos();
+  const { todos, text, updateStatus, addTodo, setText } = useTodos();
 
   return (
     <div className={styles.container}>
@@ -63,7 +60,7 @@ const Home: NextPage = () => {
         <ul className={styles.list}>
           {todos && todos.length
             ? todos.map((todo) => (
-                <li className="todo-item" key={todo.id.toString()}>
+                <li className="todo-item" key={todo.id?.toString()}>
                   <button
                     className="todo-item"
                     type="button"

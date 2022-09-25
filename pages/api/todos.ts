@@ -7,31 +7,44 @@ import { z } from 'zod';
 
 const prisma = new PrismaClient();
 
-const todoSchema = z.object({
-  id: z.number(),
+const reqDataSchema = z.object({
+  id: z.number().optional(),
   content: z.string(),
-  completed: z.boolean(),
+  completed: z.boolean().optional(),
 });
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Todo[]>
+  res: NextApiResponse<Todo | Todo[]>
 ) {
   switch (req.method) {
     case 'GET':
       // Get data from your database
-      const allTodos = await prisma.todo.findMany();
-      res.status(200).json(allTodos);
+      res.status(200).json(await prisma.todo.findMany());
       break;
     case 'POST':
       // Update or create data in your database
-      const data = todoSchema.parse(req.body);
-      await prisma.todo.create({
-        data: data,
+      const createdItem = await prisma.todo.create({
+        data: reqDataSchema.parse(req.body),
       });
+      res.status(200).json(createdItem);
       break;
+    case 'PUT':
+      // Update data
+      const putSchema = z.object({
+        id: z.number(),
+        content: z.string().optional(),
+        completed: z.boolean().optional(),
+      });
+      const putParsed = putSchema.parse(req.body);
+      const updatedItem = await prisma.todo.update({
+        where: { id: putParsed.id },
+        data: putParsed,
+      });
+      res.status(200).json(updatedItem);
     default:
-      res.setHeader('Allow', ['GET', 'PUT']);
-      res.status(405).end(`Method ${method} Not Allowed`);
+      res.setHeader('Allow', ['GET', 'POST', 'PUT']);
+      res.status(405).end(`Method ${req.method} Not Allowed`);
   }
+  await prisma.$disconnect();
 }
