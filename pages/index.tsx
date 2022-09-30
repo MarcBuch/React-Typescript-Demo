@@ -17,17 +17,26 @@ const useTodos = () => {
   const [text, setText] = useState('');
 
   useEffect(() => {
+    // GET request to backend and store Todos in state
     getTodos().then((data) => setTodos(data ?? []));
-  }, [todos]);
+  }, []);
+
+  const updateStatus = (todo: Todo) => {
+    todo.completed = !todo.completed;
+    const newTodos = todos;
+    const index = todos.findIndex((i) => i.id === todo.id);
+    newTodos[index] = todo;
+
+    // Update State
+    setTodos([...newTodos]);
+
+    // PUT request to backend
+    putTodo(todo);
+  };
 
   const addTodo = () => {
     postTodo({ content: text, completed: false });
     setText('');
-  };
-
-  const updateStatus = (todo: Todo) => {
-    todo.completed = !todo.completed;
-    putTodo(todo);
   };
 
   return { todos, text, updateStatus, addTodo, setText };

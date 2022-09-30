@@ -42,9 +42,9 @@ export default async function handler(
         data: putParsed,
       });
       res.status(200).json(updatedItem);
+      break;
     default:
       res.setHeader('Allow', ['GET', 'POST', 'PUT']);
       res.status(405).end(`Method ${req.method} Not Allowed`);
   }
-  await prisma.$disconnect();
 }

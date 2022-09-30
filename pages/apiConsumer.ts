@@ -37,8 +37,13 @@ export const putTodo = async (todo: Todo): Promise<Todo | undefined> => {
         'Content-Type': 'application/json; charset=UTF-8',
       },
     });
-    const data = await res.json();
 
+    if (!res.ok) {
+      console.log(res);
+      throw new Error(`Error apiConsumer putTodo - ${res.status} ${res.text}`);
+    }
+
+    const data = await res.json();
     return data;
   } catch (err) {
     console.log(err);
