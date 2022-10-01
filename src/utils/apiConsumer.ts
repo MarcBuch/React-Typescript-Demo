@@ -1,4 +1,4 @@
-import type { Todo } from '.';
+import type { Todo } from '../pages';
 
 export const getTodos = async (): Promise<Todo[] | undefined> => {
   try {

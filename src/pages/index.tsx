@@ -4,7 +4,7 @@ import Image from 'next/image';
 import styles from '../styles/Home.module.sass';
 import React, { useState, useEffect } from 'react';
 
-import { getTodos, postTodo, putTodo } from './apiConsumer';
+import { getTodos, postTodo, putTodo } from '../utils/apiConsumer';
 
 export type Todo = {
   id?: number;
