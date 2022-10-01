@@ -1,7 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
-import styles from '../styles/Home.module.sass';
 import React, { useState, useEffect } from 'react';
 
 import { getTodos, postTodo, putTodo } from '../utils/apiConsumer';
@@ -46,27 +45,36 @@ const Home: NextPage = () => {
   const { todos, text, updateStatus, addTodo, setText } = useTodos();
 
   return (
-    <div className={styles.container}>
+    <div className="py-4">
       <Head>
         <title>ToDo App</title>
         <meta name="description" content="My ToDo App" />
       </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>ToDo List</h1>
-        <label htmlFor="todo-text" className={styles.action}>
+      <main className="min-h-screen flex flex-col items-center">
+        <h1 className="m-2 text-4xl font-bold">ToDo List</h1>
+        <label
+          htmlFor="todo-text"
+          className="m-4 p-4 rounded text-white bg-slate-800"
+        >
           <input
+            type="text"
+            className="mr-6 bg-transparent border-b border-white outline-none"
             aria-label="todo-text"
             id="todo-text"
+            placeholder="Write Code"
             onChange={(e) => setText(e.target.value)}
             value={text}
           />
-          <button className="add-todo" onClick={addTodo} type="button">
+          <button
+            className="m-1 hover:border-b"
+            onClick={addTodo}
+            type="button"
+          >
             Add Todo
           </button>
         </label>
 
-        <ul className={styles.list}>
+        <ul className="justify-center p-0">
           {todos && todos.length
             ? todos.map((todo) => (
                 <li className="todo-item" key={todo.id?.toString()}>
@@ -93,14 +101,14 @@ const Home: NextPage = () => {
         </ul>
       </main>
 
-      <footer className={styles.footer}>
+      <footer className="flex flex-1 p-2">
         <a
           href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
           target="_blank"
           rel="noopener noreferrer"
         >
           Powered by{' '}
-          <span className={styles.logo}>
+          <span className="h-1 ml-0.5">
             <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
           </span>
         </a>
