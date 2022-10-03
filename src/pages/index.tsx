@@ -45,63 +45,51 @@ const Home: NextPage = () => {
   const { todos, text, updateStatus, addTodo, setText } = useTodos();
 
   return (
-    <div className="py-4">
+    <div className="py-4 min-h-screen flex flex-col">
       <Head>
         <title>ToDo App</title>
         <meta name="description" content="My ToDo App" />
       </Head>
-      <main className="min-h-screen flex flex-col items-center">
+      <main className="flex flex-col flex-1 items-center">
         <h1 className="m-2 text-4xl font-bold">ToDo List</h1>
-        <label
-          htmlFor="todo-text"
-          className="m-4 p-4 rounded text-white bg-slate-800"
-        >
+        <div className="m-4 p-5 w-full max-w-lg rounded text-white bg-slate-800 flex justify-evenly ">
           <input
             type="text"
-            className="mr-6 bg-transparent border-b border-white outline-none"
-            aria-label="todo-text"
+            className="w-full max-w-xs bg-transparent border-b border-white outline-none"
             id="todo-text"
-            placeholder="Write Code"
+            placeholder="Write Code ..."
             onChange={(e) => setText(e.target.value)}
             value={text}
           />
-          <button
-            className="m-1 hover:border-b"
-            onClick={addTodo}
-            type="button"
-          >
+          <button className="hover:border-b" onClick={addTodo} type="button">
             Add Todo
           </button>
-        </label>
-
-        <ul className="justify-center p-0">
+        </div>
+        <ul className="justify-center max-w-lg">
           {todos && todos.length
             ? todos.map((todo) => (
-                <li className="todo-item" key={todo.id?.toString()}>
+                <li className="mt-3 flex" key={todo.id?.toString()}>
                   <button
-                    className="todo-item"
+                    className="mr-2"
                     type="button"
                     onClick={() => updateStatus(todo)}
                   >
                     {todo && todo.completed ? '👌' : '👋'}
                   </button>
-                  <span
-                    className="todo-item-text"
-                    style={
-                      todo.completed
-                        ? { textDecoration: 'line-through' }
-                        : { textDecoration: 'none' }
-                    }
+                  <p
+                    className={`break-all ${
+                      todo.completed ? 'line-through' : ''
+                    }`}
                   >
                     {todo.content}
-                  </span>
+                  </p>
                 </li>
               ))
             : 'No todos, yay!'}
         </ul>
       </main>
 
-      <footer className="flex flex-1 p-2">
+      <footer className="mt-auto flex flex-col items-center">
         <a
           href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
           target="_blank"
