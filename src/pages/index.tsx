@@ -1,10 +1,10 @@
-import type { NextPage } from 'next';
-import Head from 'next/head';
-import Image from 'next/image';
-import React, { useState } from 'react';
+import type { NextPage } from "next";
+import Head from "next/head";
+import Image from "next/image";
+import React, { useEffect, useState } from "react";
 
-import { getTodos, postTodo, putTodo } from '../utils/apiConsumer';
-import TodoList from '../components/TodoList';
+import { getTodos, postTodo, putTodo } from "../utils/apiConsumer";
+import TodoList from "../components/TodoList";
 
 export type Todo = {
   id?: number;
@@ -13,22 +13,51 @@ export type Todo = {
 };
 
 const useTodos = () => {
-  const [text, setText] = useState('');
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [text, setText] = useState("");
 
-  const addTodo = () => {
-    postTodo({ content: text, completed: false });
-    setText('');
+  useEffect(() => {
+    // GET request to backend and store Todos in state
+    getTodos().then((data) => setTodos(data ?? []));
+  }, []);
+
+  const addTodo = async () => {
+    const newTodo = { content: text, completed: false };
+
+    const data = await postTodo(newTodo);
+
+    if (data) {
+      console.log(data);
+      setTodos([...todos, data]);
+    }
+    setText("");
+  };
+
+  const updateStatus = (todo: Todo) => {
+    todo.completed = !todo.completed;
+    const newTodos = todos;
+    const index = todos.findIndex((i) => i.id === todo.id);
+    newTodos[index] = todo;
+
+    // Update State
+    setTodos([...newTodos]);
+    console.log("Updating state");
+
+    // PUT request to backend
+    putTodo(todo);
   };
 
   return {
+    todos,
     text,
     setText,
     addTodo,
+    updateStatus,
   };
 };
 
 const Home: NextPage = () => {
-  const { text, setText, addTodo } = useTodos();
+  const { todos, text, setText, addTodo, updateStatus } = useTodos();
 
   return (
     <div className="py-4 min-h-screen flex flex-col items-center dark:bg-slate-900 dark:text-white">
@@ -51,7 +80,7 @@ const Home: NextPage = () => {
             Add Todo
           </button>
         </div>
-        <TodoList />
+        <TodoList todos={todos} updateStatus={updateStatus} />
       </main>
 
       <footer className="mt-auto w-full max-w-xl flex flex-row justify-around">
@@ -60,7 +89,7 @@ const Home: NextPage = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{' '}
+          Powered by{" "}
           <span className="h-1 ml-0.5">
             <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
           </span>

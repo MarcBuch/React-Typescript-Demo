@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import type { Todo } from "../pages";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 import { getTodos, putTodo } from "../utils/apiConsumer";
 
@@ -9,29 +10,10 @@ interface hovering {
 }
 
 const useTodos = () => {
-  const [todos, setTodos] = useState<Todo[]>([]);
   const [isHovering, setIsHovering] = useState<hovering>({
     isHovering: false,
     hoveringOn: "",
   });
-
-  useEffect(() => {
-    // GET request to backend and store Todos in state
-    getTodos().then((data) => setTodos(data ?? []));
-  }, []);
-
-  const updateStatus = (todo: Todo) => {
-    todo.completed = !todo.completed;
-    const newTodos = todos;
-    const index = todos.findIndex((i) => i.id === todo.id);
-    newTodos[index] = todo;
-
-    // Update State
-    setTodos([...newTodos]);
-
-    // PUT request to backend
-    putTodo(todo);
-  };
 
   const clearHovering = (): void => {
     setIsHovering({
@@ -48,17 +30,21 @@ const useTodos = () => {
   };
 
   return {
-    todos,
     isHovering,
     clearHovering,
     updateHovering,
-    updateStatus,
   };
 };
 
-const TodoList = () => {
-  const { todos, isHovering, clearHovering, updateHovering, updateStatus } =
-    useTodos();
+export type TodoListProps = {
+  todos: Todo[];
+  updateStatus: (todo: Todo) => void;
+};
+
+const TodoList = ({ todos, updateStatus }: TodoListProps) => {
+  const { isHovering, clearHovering, updateHovering } = useTodos();
+
+  const [listRef] = useAutoAnimate<HTMLUListElement>();
 
   const handleMouseOver =
     (key: string) => (event: React.MouseEvent<HTMLLIElement>) => {
@@ -70,7 +56,7 @@ const TodoList = () => {
   };
 
   return (
-    <ul className="justify-center max-w-lg">
+    <ul className="justify-center max-w-lg" ref={listRef}>
       {todos && todos.length
         ? todos.map((todo) => (
             <li
