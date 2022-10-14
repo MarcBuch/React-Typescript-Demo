@@ -3,7 +3,7 @@ import Head from "next/head";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
-import { getTodos, postTodo, putTodo } from "../utils/apiConsumer";
+import { getTodos, postTodo, putTodo, deleteTodo } from "../utils/apiConsumer";
 import TodoList from "../components/TodoList";
 
 export type Todo = {
@@ -41,10 +41,23 @@ const useTodos = () => {
 
     // Update State
     setTodos([...newTodos]);
-    console.log("Updating state");
 
     // PUT request to backend
     putTodo(todo);
+  };
+
+  const removeTodo = (todo: Todo) => {
+    const newTodos = todos;
+    const index = newTodos.findIndex((i) => i.id === todo.id);
+    if (index > -1) {
+      newTodos.splice(index, 1);
+    }
+
+    // Update State
+    setTodos([...newTodos]);
+
+    // DELETE request to backend
+    deleteTodo(todo);
   };
 
   return {
@@ -53,11 +66,13 @@ const useTodos = () => {
     setText,
     addTodo,
     updateStatus,
+    removeTodo,
   };
 };
 
 const Home: NextPage = () => {
-  const { todos, text, setText, addTodo, updateStatus } = useTodos();
+  const { todos, text, setText, addTodo, updateStatus, removeTodo } =
+    useTodos();
 
   return (
     <div className="py-4 min-h-screen flex flex-col items-center dark:bg-slate-900 dark:text-white">
@@ -80,7 +95,11 @@ const Home: NextPage = () => {
             Add Todo
           </button>
         </div>
-        <TodoList todos={todos} updateStatus={updateStatus} />
+        <TodoList
+          todos={todos}
+          updateStatus={updateStatus}
+          removeTodo={removeTodo}
+        />
       </main>
 
       <footer className="mt-auto w-full max-w-xl flex flex-row justify-around">

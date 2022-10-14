@@ -1,8 +1,8 @@
-import type { Todo } from '../pages';
+import type { Todo } from "../pages";
 
 export const getTodos = async (): Promise<Todo[] | undefined> => {
   try {
-    const res = await fetch('http://localhost:3000/api/todos');
+    const res = await fetch("http://localhost:3000/api/todos");
     const data = await res.json();
 
     return data;
@@ -13,11 +13,11 @@ export const getTodos = async (): Promise<Todo[] | undefined> => {
 
 export const postTodo = async (todo: Todo): Promise<Todo | undefined> => {
   try {
-    const res = await fetch('http://localhost:3000/api/todos', {
-      method: 'POST',
+    const res = await fetch("http://localhost:3000/api/todos", {
+      method: "POST",
       body: JSON.stringify(todo),
       headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
+        "Content-Type": "application/json; charset=UTF-8",
       },
     });
     const data = await res.json();
@@ -30,11 +30,11 @@ export const postTodo = async (todo: Todo): Promise<Todo | undefined> => {
 
 export const putTodo = async (todo: Todo): Promise<Todo | undefined> => {
   try {
-    const res = await fetch('http://localhost:3000/api/todos', {
-      method: 'PUT',
+    const res = await fetch("http://localhost:3000/api/todos", {
+      method: "PUT",
       body: JSON.stringify(todo),
       headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
+        "Content-Type": "application/json; charset=UTF-8",
       },
     });
 
@@ -46,6 +46,33 @@ export const putTodo = async (todo: Todo): Promise<Todo | undefined> => {
     const data = await res.json();
     return data;
   } catch (err) {
+    console.log(err);
+  }
+};
+
+export const deleteTodo = async (todo: Todo): Promise<Todo | undefined> => {
+  try {
+    const res = await fetch("http://localhost:3000/api/todos", {
+      method: "DELETE",
+      body: JSON.stringify({ id: todo.id }),
+      headers: {
+        "Content-Type": "application/json; charset=UTF-8",
+      },
+    });
+
+    if (!res.ok) {
+      console.log(res);
+      throw new Error(
+        `Error apiConsumer deleteTodo - ${res.status} ${res.text}`
+      );
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log(err.message);
+    }
     console.log(err);
   }
 };
