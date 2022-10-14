@@ -27,7 +27,6 @@ const useTodos = () => {
     const data = await postTodo(newTodo);
 
     if (data) {
-      console.log(data);
       setTodos([...todos, data]);
     }
     setText("");
@@ -74,6 +73,13 @@ const Home: NextPage = () => {
   const { todos, text, setText, addTodo, updateStatus, removeTodo } =
     useTodos();
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key == "Enter") {
+      e.preventDefault();
+      addTodo();
+    }
+  };
+
   return (
     <div className="py-4 min-h-screen flex flex-col items-center dark:bg-slate-900 dark:text-white">
       <Head>
@@ -89,11 +95,16 @@ const Home: NextPage = () => {
             id="todo-text"
             placeholder="Write Code ..."
             onChange={(e) => setText(e.target.value)}
+            onKeyPress={handleKeyPress}
             value={text}
           />
-          <button className="hover:border-b" onClick={addTodo} type="button">
+          <button
+            className="ml-5 w-1/3 hover:border-b"
+            onClick={addTodo}
+            type="button"
+          >
             Add Todo
-          </button>
+          </button>{" "}
         </div>
         <TodoList
           todos={todos}
