@@ -2,9 +2,10 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 import { getTodos, postTodo, putTodo, deleteTodo } from "../utils/apiConsumer";
-import TodoList from "../components/TodoList";
+import TodoItem from "../components/TodoItem";
 import { Toggle } from "../components/ThemeToggle";
 
 export type Todo = {
@@ -12,6 +13,11 @@ export type Todo = {
   content: string;
   completed: boolean;
 };
+
+export type ItemChangeHandler = (
+  method: "update" | "delete",
+  todo: Todo
+) => void;
 
 const useTodos = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -33,10 +39,10 @@ const useTodos = () => {
     setText("");
   };
 
-  const updateStatus = (todo: Todo) => {
-    todo.completed = !todo.completed;
+  const updateTodo = (todo: Todo) => {
     const newTodos = todos;
     const index = todos.findIndex((i) => i.id === todo.id);
+    console.log(newTodos[index]);
     newTodos[index] = todo;
 
     // Update State
@@ -60,13 +66,16 @@ const useTodos = () => {
     deleteTodo(todo);
   };
 
-  const handleItemChange = (method: string, todo: Todo) => {
+  const handleItemChange: ItemChangeHandler = (method: string, todo: Todo) => {
     switch (method) {
       case "update":
-        updateStatus(todo);
+        console.log(`Index - handleItemChange - ${todo.content}`);
+        updateTodo(todo);
+        break;
 
       case "delete":
         removeTodo(todo);
+        break;
     }
   };
 
@@ -80,6 +89,8 @@ const useTodos = () => {
 };
 
 const Home: NextPage = () => {
+  const [listRef] = useAutoAnimate<HTMLUListElement>();
+
   const { todos, text, setText, addTodo, handleItemChange } = useTodos();
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -115,7 +126,17 @@ const Home: NextPage = () => {
             Add Todo
           </button>{" "}
         </div>
-        <TodoList todos={todos} onItemChange={handleItemChange} />
+        <ul className="justify-center max-w-lg w-full" ref={listRef}>
+          {todos && todos.length
+            ? todos.map((todo) => (
+                <TodoItem
+                  key={todo.id?.toString() ?? ""}
+                  todo={todo}
+                  onItemChange={handleItemChange}
+                />
+              ))
+            : "No todos, yay!"}
+        </ul>
       </main>
 
       <footer className="mt-auto w-full max-w-xl flex flex-row justify-around">

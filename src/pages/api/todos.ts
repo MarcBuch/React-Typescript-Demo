@@ -37,6 +37,7 @@ export default async function handler(
         completed: z.boolean().optional(),
       });
       const putParsed = putSchema.parse(req.body);
+      console.log(putParsed);
       const updatedItem = await prisma.todo.update({
         where: { id: putParsed.id },
         data: putParsed,
