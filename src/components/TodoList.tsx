@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import type { Todo } from "../pages";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-
-import { getTodos, putTodo } from "../utils/apiConsumer";
 
 interface hovering {
   isHovering: boolean;
@@ -36,13 +34,12 @@ const useTodos = () => {
   };
 };
 
-export type TodoListProps = {
+export interface TodoListProps {
   todos: Todo[];
-  updateStatus: (todo: Todo) => void;
-  removeTodo: (todo: Todo) => void;
-};
+  onItemChange: (method: string, todo: Todo) => void;
+}
 
-const TodoList = ({ todos, updateStatus, removeTodo }: TodoListProps) => {
+const TodoList = ({ todos, onItemChange }: TodoListProps) => {
   const { isHovering, clearHovering, updateHovering } = useTodos();
 
   const [listRef] = useAutoAnimate<HTMLUListElement>();
@@ -69,7 +66,7 @@ const TodoList = ({ todos, updateStatus, removeTodo }: TodoListProps) => {
               <button
                 className="mr-2"
                 type="button"
-                onClick={() => updateStatus(todo)}
+                onClick={() => onItemChange("update", todo)}
               >
                 {todo && todo.completed ? "👌" : "👋"}
               </button>
@@ -83,7 +80,7 @@ const TodoList = ({ todos, updateStatus, removeTodo }: TodoListProps) => {
                 <button
                   className="ml-1 w-5 h-6"
                   type="button"
-                  onClick={() => removeTodo(todo)}
+                  onClick={() => onItemChange("delete", todo)}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

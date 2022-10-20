@@ -60,19 +60,27 @@ const useTodos = () => {
     deleteTodo(todo);
   };
 
+  const handleItemChange = (method: string, todo: Todo) => {
+    switch (method) {
+      case "update":
+        updateStatus(todo);
+
+      case "delete":
+        removeTodo(todo);
+    }
+  };
+
   return {
     todos,
     text,
     setText,
     addTodo,
-    updateStatus,
-    removeTodo,
+    handleItemChange,
   };
 };
 
 const Home: NextPage = () => {
-  const { todos, text, setText, addTodo, updateStatus, removeTodo } =
-    useTodos();
+  const { todos, text, setText, addTodo, handleItemChange } = useTodos();
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key == "Enter") {
@@ -107,11 +115,7 @@ const Home: NextPage = () => {
             Add Todo
           </button>{" "}
         </div>
-        <TodoList
-          todos={todos}
-          updateStatus={updateStatus}
-          removeTodo={removeTodo}
-        />
+        <TodoList todos={todos} onItemChange={handleItemChange} />
       </main>
 
       <footer className="mt-auto w-full max-w-xl flex flex-row justify-around">
