@@ -1,19 +1,42 @@
+import useSWR from "swr";
 import type { Todo } from "../pages";
 
-export const getTodos = async (): Promise<Todo[] | undefined> => {
-  try {
-    const res = await fetch("http://localhost:3000/api/todos");
-    const data = await res.json();
+const baseUrl = "/api/todos";
 
-    return data;
-  } catch (err) {
-    console.log(err);
-  }
+declare function fetch(
+  input: RequestInfo,
+  init?: RequestInit
+): Promise<Response>;
+
+const fetcher = async (
+  input: RequestInfo,
+  init: RequestInit,
+  ...args: any[]
+): Promise<Todo[] | undefined> => {
+  const res = await fetch(input, init);
+  return res.json();
+};
+
+export const useTodos = () => {
+  const { data, error } = useSWR("/api/todos", fetcher);
+
+  return {
+    todos: data,
+    isLoading: !error && !data,
+    isError: error,
+  };
+};
+
+// TODO: Look into useSWRMutation
+export const addTodo = async (text: string) => {
+  const newTodo = { content: text, completed: false };
+
+  await postTodo(newTodo);
 };
 
 export const postTodo = async (todo: Todo): Promise<Todo | undefined> => {
   try {
-    const res = await fetch("http://localhost:3000/api/todos", {
+    const res = await fetch(baseUrl, {
       method: "POST",
       body: JSON.stringify(todo),
       headers: {
@@ -30,7 +53,7 @@ export const postTodo = async (todo: Todo): Promise<Todo | undefined> => {
 
 export const putTodo = async (todo: Todo): Promise<Todo | undefined> => {
   try {
-    const res = await fetch("http://localhost:3000/api/todos", {
+    const res = await fetch(baseUrl, {
       method: "PUT",
       body: JSON.stringify(todo),
       headers: {
@@ -52,7 +75,7 @@ export const putTodo = async (todo: Todo): Promise<Todo | undefined> => {
 
 export const deleteTodo = async (todo: Todo): Promise<Todo | undefined> => {
   try {
-    const res = await fetch("http://localhost:3000/api/todos", {
+    const res = await fetch(baseUrl, {
       method: "DELETE",
       body: JSON.stringify({ id: todo.id }),
       headers: {

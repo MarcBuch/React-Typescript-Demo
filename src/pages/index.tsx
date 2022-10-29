@@ -1,10 +1,10 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 
-import { getTodos, postTodo, putTodo, deleteTodo } from "../utils/apiConsumer";
+import { useTodos, addTodo, putTodo, deleteTodo } from "../utils/apiConsumer";
 import TodoItem from "../components/TodoItem";
 import { Toggle } from "../components/ThemeToggle";
 
@@ -19,84 +19,36 @@ export type ItemChangeHandler = (
   todo: Todo
 ) => void;
 
-const useTodos = () => {
-  const [todos, setTodos] = useState<Todo[]>([]);
+const Home: NextPage = () => {
+  const { todos, isLoading, isError } = useTodos();
   const [text, setText] = useState("");
 
-  useEffect(() => {
-    // GET request to backend and store Todos in state
-    getTodos().then((data) => setTodos(data ?? []));
-  }, []);
+  const [listRef] = useAutoAnimate<HTMLUListElement>();
 
-  const addTodo = async () => {
-    const newTodo = { content: text, completed: false };
+  const handleSubmitOnEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key == "Enter") {
+      e.preventDefault();
 
-    const data = await postTodo(newTodo);
-
-    if (data) {
-      setTodos([...todos, data]);
+      addTodo(text);
+      setText("");
     }
+  };
+
+  const handleSubmitOnClick = () => {
+    addTodo(text);
     setText("");
-  };
-
-  const updateTodo = (todo: Todo) => {
-    const newTodos = todos;
-    const index = todos.findIndex((i) => i.id === todo.id);
-    console.log(newTodos[index]);
-    newTodos[index] = todo;
-
-    // Update State
-    setTodos([...newTodos]);
-
-    // PUT request to backend
-    putTodo(todo);
-  };
-
-  const removeTodo = (todo: Todo) => {
-    const newTodos = todos;
-    const index = newTodos.findIndex((i) => i.id === todo.id);
-    if (index > -1) {
-      newTodos.splice(index, 1);
-    }
-
-    // Update State
-    setTodos([...newTodos]);
-
-    // DELETE request to backend
-    deleteTodo(todo);
   };
 
   const handleItemChange: ItemChangeHandler = (method: string, todo: Todo) => {
     switch (method) {
       case "update":
         console.log(`Index - handleItemChange - ${todo.content}`);
-        updateTodo(todo);
+        putTodo(todo);
         break;
 
       case "delete":
-        removeTodo(todo);
+        deleteTodo(todo);
         break;
-    }
-  };
-
-  return {
-    todos,
-    text,
-    setText,
-    addTodo,
-    handleItemChange,
-  };
-};
-
-const Home: NextPage = () => {
-  const [listRef] = useAutoAnimate<HTMLUListElement>();
-
-  const { todos, text, setText, addTodo, handleItemChange } = useTodos();
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key == "Enter") {
-      e.preventDefault();
-      addTodo();
     }
   };
 
@@ -115,28 +67,32 @@ const Home: NextPage = () => {
             id="todo-text"
             placeholder="Write Code ..."
             onChange={(e) => setText(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyPress={handleSubmitOnEnter}
             value={text}
           />
           <button
             className="ml-5 w-1/3 hover:border-b"
-            onClick={addTodo}
+            onClick={handleSubmitOnClick}
             type="button"
           >
             Add Todo
           </button>{" "}
         </div>
-        <ul className="justify-center max-w-lg w-full" ref={listRef}>
-          {todos && todos.length
-            ? todos.map((todo) => (
-                <TodoItem
-                  key={todo.id?.toString() ?? ""}
-                  todo={todo}
-                  onItemChange={handleItemChange}
-                />
-              ))
-            : "No todos, yay!"}
-        </ul>
+        {isError ? (
+          <p>Don`t Panic, there might be some issues ...</p>
+        ) : (
+          <ul className="justify-center max-w-lg w-full" ref={listRef}>
+            {todos && todos.length
+              ? todos.map((todo) => (
+                  <TodoItem
+                    key={todo.id?.toString() ?? ""}
+                    todo={todo}
+                    onItemChange={handleItemChange}
+                  />
+                ))
+              : "No todos, yay!"}
+          </ul>
+        )}
       </main>
 
       <footer className="mt-auto w-full max-w-xl flex flex-row justify-around">
